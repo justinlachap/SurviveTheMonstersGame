@@ -1,6 +1,6 @@
 import sys
 
-from player import *
+from src.player import *
 
 FPS = 0.05
 os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (30, 30)
