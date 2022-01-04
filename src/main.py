@@ -1,4 +1,5 @@
 import sys
+import time
 
 from src.player import *
 
@@ -11,7 +12,6 @@ player1 = Player(2, 435)
 surf = pygame.image.load(
     os.path.join('assets', 'Free Pixel Art Forest', 'Free Pixel Art Forest', 'Preview', 'Background.png'))
 surf = pygame.transform.scale(surf, (surf.get_width() / 1.25, surf.get_height() / 1.25))
-print(surf.get_width(), surf.get_height())
 last_key = None
 background_x = 0
 
@@ -53,5 +53,10 @@ while True:
     if last_key == pygame.K_SPACE:
         if not player1.attacks():
             last_key= None
+    if last_key == pygame.K_UP:
+        if not player1.jumps():
+            last_key = None
 
+    if player1.health == 0:
+        player1.dies()
     pygame.display.update()

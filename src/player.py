@@ -1,11 +1,9 @@
 import os
-import time
 
 import pygame
 
 
-# image = pygame.image.load(os.path.join('assets', 'Monster_Creatures_Fantasy(Version 1.3)', 'Fantasy Warrior', 'Sprites', 'Idle.png'))
-# image = pygame.transform.scale(image, (image.get_width()*1.5, image.get_height()*1.5))
+# source: https://stackoverflow.com/questions/64867475/how-to-put-a-health-bar-over-the-sprite-in-pygame
 def draw_health_bar(surf, pos, size, borderC, backC, healthC, progress):
     pygame.draw.rect(surf, backC, (*pos, *size))
     pygame.draw.rect(surf, borderC, (*pos, *size), 1)
@@ -15,91 +13,44 @@ def draw_health_bar(surf, pos, size, borderC, backC, healthC, progress):
     pygame.draw.rect(surf, healthC, rect)
 
 
-max_health = 100
+MAX_HEALTH = 100
+SCALE = 1.5
 
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
-        self.attacking_sprite = 0
+        self.attacking_sprite, self.jumping_sprite = 0, 0
         self.x = x
         self.y = y
         self.isGoingRight = True
         self.isAttacking = False
-        self.health = 90
+        self.health = 80
         self.running = False
-        self.right_srites, self.left_sprites, self.staticR_sprites, self.staticL_sprites, self.attackR_sprites, self.attackL_sprites = [], [], [], [], [], []
-        self.right_srites.append(pygame.image.load(
-            os.path.join('assets', 'Monster_Creatures_Fantasy(Version 1.3)', 'Fantasy Warrior', 'Sprites', 'run',
-                         'tile000.png')))
-        self.right_srites.append(pygame.image.load(
-            os.path.join('assets', 'Monster_Creatures_Fantasy(Version 1.3)', 'Fantasy Warrior', 'Sprites', 'run',
-                         'tile001.png')))
-        self.right_srites.append(pygame.image.load(
-            os.path.join('assets', 'Monster_Creatures_Fantasy(Version 1.3)', 'Fantasy Warrior', 'Sprites', 'run',
-                         'tile002.png')))
-        self.right_srites.append(pygame.image.load(
-            os.path.join('assets', 'Monster_Creatures_Fantasy(Version 1.3)', 'Fantasy Warrior', 'Sprites', 'run',
-                         'tile003.png')))
-        self.right_srites.append(pygame.image.load(
-            os.path.join('assets', 'Monster_Creatures_Fantasy(Version 1.3)', 'Fantasy Warrior', 'Sprites', 'run',
-                         'tile004.png')))
-        self.right_srites.append(pygame.image.load(
-            os.path.join('assets', 'Monster_Creatures_Fantasy(Version 1.3)', 'Fantasy Warrior', 'Sprites', 'run',
-                         'tile005.png')))
-        self.right_srites.append(pygame.image.load(
-            os.path.join('assets', 'Monster_Creatures_Fantasy(Version 1.3)', 'Fantasy Warrior', 'Sprites', 'run',
-                         'tile006.png')))
-        self.right_srites.append(pygame.image.load(
-            os.path.join('assets', 'Monster_Creatures_Fantasy(Version 1.3)', 'Fantasy Warrior', 'Sprites', 'run',
-                         'tile007.png')))
-        for i in range(0, 8):
-            self.attackR_sprites.append(pygame.image.load(
-                os.path.join('assets', 'Monster_Creatures_Fantasy(Version 1.3)', 'Fantasy Warrior', 'Sprites',
-                             'attacker',
-                             'tile00{}.png'.format(i))))
-        for i, e in enumerate(self.attackR_sprites):
-            newIm = pygame.transform.scale(e, (e.get_height() * 1.5, e.get_width() * 1.5))
-            self.attackR_sprites[i] = newIm
-        for i in range(0, 10):
-            self.staticR_sprites.append(pygame.image.load(
-                os.path.join('assets', 'Monster_Creatures_Fantasy(Version 1.3)', 'Fantasy Warrior', 'Sprites', 'static',
-                             'tile00{}.png'.format(i))))
-        for i, e in enumerate(self.right_srites):
-            newIm = pygame.transform.scale(e, (e.get_height() * 1.5, e.get_width() * 1.5))
-            self.right_srites[i] = newIm
 
-        for i, e in enumerate(self.staticR_sprites):
-            newIm = pygame.transform.scale(e, (e.get_height() * 1.5, e.get_width() * 1.5))
-            self.staticR_sprites[i] = newIm
-
-        for sprite in self.right_srites:
-            self.left_sprites.append(pygame.transform.flip(sprite, True, False))
-        for sprite in self.staticR_sprites:
-            self.staticL_sprites.append(pygame.transform.flip(sprite, True, False))
-        for sprite in self.attackR_sprites:
-            self.attackL_sprites.append(pygame.transform.flip(sprite,True,False))
+        self.right_srites, self.left_sprites, self.staticR_sprites, self.staticL_sprites, self.attackR_sprites, self.attackL_sprites, self.jumpR_sprites, self.jumpL_sprites = [], [], [], [], [], [], [], []
+        self.generateSprites()
 
         self.current_sprite = 0
         self.image = self.staticR_sprites[self.current_sprite]
-
-        self.rect = self.image.get_rect()
-        self.rect.topleft = [x, y]
+        self.wait = 0
 
     def animate(self):
         self.running = True
 
     def rest(self):
-        if self.isGoingRight:
-            self.current_sprite += 1
-            if self.current_sprite >= len(self.staticR_sprites) or self.current_sprite < 0:
-                self.current_sprite = 0
-            self.image = self.staticR_sprites[self.current_sprite]
-        else:
-            self.current_sprite -= 1
-            if -self.current_sprite >= len(self.staticL_sprites) or self.current_sprite > 0:
-                self.current_sprite = 0
-            self.image = self.staticL_sprites[self.current_sprite]
+        if self.wait % 2 == 0:
+            if self.isGoingRight:
+                self.current_sprite += 1
+                if self.current_sprite >= len(self.staticR_sprites) or self.current_sprite < 0:
+                    self.current_sprite = 0
+                self.image = self.staticR_sprites[self.current_sprite]
+            else:
+                self.current_sprite -= 1
+                if -self.current_sprite >= len(self.staticL_sprites) or self.current_sprite > 0:
+                    self.current_sprite = 0
+                self.image = self.staticL_sprites[self.current_sprite]
+        self.wait += 1
 
     def walks(self, right):
         if right and self.running:
@@ -122,9 +73,8 @@ class Player(pygame.sprite.Sprite):
 
     def draw_health(self, surf):
         health_rect = pygame.Rect(self.x + 107, self.y + 68, self.image.get_width() / 9, 10)
-
         draw_health_bar(surf, health_rect.topleft, health_rect.size,
-                        (0, 0, 0), (255, 0, 0), (0, 255, 0), self.health / max_health)
+                        (0, 0, 0), (255, 0, 0), (0, 255, 0), self.health / MAX_HEALTH)
 
     def attacks(self):
         if self.isGoingRight:
@@ -144,6 +94,66 @@ class Player(pygame.sprite.Sprite):
                 return False
         return True
 
+    def jumps(self):
+        if self.jumping_sprite <= 2:
+            self.y -= 15
+        else:
+            self.y += 15
 
+        if self.isGoingRight:
+            self.image = self.jumpR_sprites[self.jumping_sprite]
+            self.jumping_sprite += 1
 
+            if self.jumping_sprite >= len(self.jumpR_sprites) or self.jumping_sprite < 0:
+                self.jumping_sprite = 0
+                return False
 
+        else:
+            self.image = self.jumpL_sprites[self.jumping_sprite]
+            self.jumping_sprite += 1
+
+            if self.jumping_sprite >= len(self.jumpL_sprites) or self.jumping_sprite < 0:
+                self.jumping_sprite = 0
+                return False
+        return True
+
+    def dies(self):
+        pass
+
+    def generateSprites(self):
+        num_walking_sprites = 8
+        num_jumping_sprites = 6
+        num_static_sprites = 10
+
+        for i in range(num_walking_sprites):
+            oldIm = pygame.image.load(
+                os.path.join('assets', 'Monster_Creatures_Fantasy(Version 1.3)', 'Fantasy Warrior', 'Sprites', 'run',
+                             'tile00{}.png'.format(i)))
+            newIm = pygame.transform.scale(oldIm, (oldIm.get_height() * SCALE, oldIm.get_width() * SCALE))
+            self.right_srites.append(newIm)
+            self.left_sprites.append(pygame.transform.flip(newIm, True, False))
+
+        for i in range(num_jumping_sprites):
+            oldIm = pygame.image.load(
+                os.path.join('assets', 'Monster_Creatures_Fantasy(Version 1.3)', 'Fantasy Warrior', 'Sprites', 'jump',
+                             'tile00{}.png'.format(i)))
+            newIm = pygame.transform.scale(oldIm, (oldIm.get_height() * SCALE, oldIm.get_width() * SCALE))
+            self.jumpR_sprites.append(newIm)
+            self.jumpL_sprites.append(pygame.transform.flip(newIm, True, False))
+
+        for i in range(num_walking_sprites):
+            oldIm = pygame.image.load(
+                os.path.join('assets', 'Monster_Creatures_Fantasy(Version 1.3)', 'Fantasy Warrior', 'Sprites',
+                             'attacker',
+                             'tile00{}.png'.format(i)))
+            newIm = pygame.transform.scale(oldIm, (oldIm.get_height() * SCALE, oldIm.get_width() * SCALE))
+            self.attackR_sprites.append(newIm)
+            self.attackL_sprites.append(pygame.transform.flip(newIm, True, False))
+
+        for i in range(num_static_sprites):
+            oldIm = pygame.image.load(
+                os.path.join('assets', 'Monster_Creatures_Fantasy(Version 1.3)', 'Fantasy Warrior', 'Sprites', 'static',
+                             'tile00{}.png'.format(i)))
+            newIm = pygame.transform.scale(oldIm, (oldIm.get_height() * SCALE, oldIm.get_width() * SCALE))
+            self.staticR_sprites.append(newIm)
+            self.staticL_sprites.append(pygame.transform.flip(newIm, True, False))
