@@ -14,7 +14,7 @@ def draw_health_bar(surf, pos, size, borderC, backC, healthC, progress):
 
 
 MAX_HEALTH = 100
-SCALE = 1.5
+SCALE = 2
 
 
 class Player(pygame.sprite.Sprite):
@@ -28,7 +28,7 @@ class Player(pygame.sprite.Sprite):
         self.health = 80
         self.running = False
 
-        self.right_srites, self.left_sprites, self.staticR_sprites, self.staticL_sprites, self.attackR_sprites, self.attackL_sprites, self.jumpR_sprites, self.jumpL_sprites = [], [], [], [], [], [], [], []
+        self.right_sprites, self.left_sprites, self.staticR_sprites, self.staticL_sprites, self.attackR_sprites, self.attackL_sprites, self.jumpR_sprites, self.jumpL_sprites = [], [], [], [], [], [], [], []
         self.generateSprites()
 
         self.current_sprite = 0
@@ -56,10 +56,10 @@ class Player(pygame.sprite.Sprite):
         if right and self.running:
             self.x += 4
             self.current_sprite += 1
-            if self.current_sprite >= len(self.right_srites) or self.current_sprite < 0:
+            if self.current_sprite >= len(self.right_sprites) or self.current_sprite < 0:
                 self.current_sprite = 0
 
-            self.image = self.right_srites[self.current_sprite]
+            self.image = self.right_sprites[self.current_sprite]
             self.isGoingRight = True
 
         elif not right and self.running:
@@ -72,7 +72,7 @@ class Player(pygame.sprite.Sprite):
             self.isGoingRight = False
 
     def draw_health(self, surf):
-        health_rect = pygame.Rect(self.x + 107, self.y + 68, self.image.get_width() / 9, 10)
+        health_rect = pygame.Rect(self.x + 145, self.y + 88, self.image.get_width() / 9, 10)
         draw_health_bar(surf, health_rect.topleft, health_rect.size,
                         (0, 0, 0), (255, 0, 0), (0, 255, 0), self.health / MAX_HEALTH)
 
@@ -96,9 +96,9 @@ class Player(pygame.sprite.Sprite):
 
     def jumps(self):
         if self.jumping_sprite <= 2:
-            self.y -= 15
+            self.y -= 20
         else:
-            self.y += 15
+            self.y += 20
 
         if self.isGoingRight:
             self.image = self.jumpR_sprites[self.jumping_sprite]
@@ -130,7 +130,7 @@ class Player(pygame.sprite.Sprite):
                 os.path.join('assets', 'Monster_Creatures_Fantasy(Version 1.3)', 'Fantasy Warrior', 'Sprites', 'run',
                              'tile00{}.png'.format(i)))
             newIm = pygame.transform.scale(oldIm, (oldIm.get_height() * SCALE, oldIm.get_width() * SCALE))
-            self.right_srites.append(newIm)
+            self.right_sprites.append(newIm)
             self.left_sprites.append(pygame.transform.flip(newIm, True, False))
 
         for i in range(num_jumping_sprites):
