@@ -25,7 +25,7 @@ class Player(pygame.sprite.Sprite):
         self.y = y
         self.isGoingRight = True
         self.isAttacking = False
-        self.health = 80
+        self.health = 100
         self.running = False
 
         self.right_sprites, self.left_sprites, self.staticR_sprites, self.staticL_sprites, self.attackR_sprites, self.attackL_sprites, self.jumpR_sprites, self.jumpL_sprites = [], [], [], [], [], [], [], []
@@ -100,6 +100,7 @@ class Player(pygame.sprite.Sprite):
         else:
             self.y += 20
 
+
         if self.isGoingRight:
             self.image = self.jumpR_sprites[self.jumping_sprite]
             self.jumping_sprite += 1
@@ -157,3 +158,10 @@ class Player(pygame.sprite.Sprite):
             newIm = pygame.transform.scale(oldIm, (oldIm.get_height() * SCALE, oldIm.get_width() * SCALE))
             self.staticR_sprites.append(newIm)
             self.staticL_sprites.append(pygame.transform.flip(newIm, True, False))
+
+    def readjust(self, bg):
+        self.draw_health(bg)
+        if self.x <= -120:
+            self.x = 610
+        elif self.x >= 610:
+            self.x = -120
