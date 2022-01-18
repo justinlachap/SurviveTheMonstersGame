@@ -16,7 +16,7 @@ pygame.init()
 background = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 player1 = Player(400, 385)
-monsters = [monster.Skeleton(50), monster.Goblin(-300)]  # monster.Goblin(300)]
+monsters = [monster.Skeleton(50), monster.Goblin(-300)]
 surf = pygame.image.load(
     os.path.join('assets', 'Free Pixel Art Forest', 'Free Pixel Art Forest', 'Preview', 'Background.png'))
 surf = pygame.transform.scale(surf, (surf.get_width() / 1.25, surf.get_height() / 1.25))
@@ -90,7 +90,7 @@ while True:
                 background.blit(monst.projectile_image, (monst.projectile_x, monst.y + 30))
                 print(monst.projectile_x)
                 if monst.projectile_x >= player1.x + 85 and monst.x <= player1.x + 95 and player1.jumping_sprite == 0:
-                    player1.health -= 10
+                    player1.health -= 20
                     monst.has_projectile = False
                 elif monst.projectile_x >= player1.x + 85 and monst.x <= player1.x + 95 and player1.jumping_sprite != 0:
                     monst.has_projectile = False
