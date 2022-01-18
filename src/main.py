@@ -15,8 +15,8 @@ os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (SCREEN_POS, SCREEN_POS)
 pygame.init()
 background = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
-player1 = Player(2, 385)
-monsters = [monster.Skeleton(100), monster.Goblin(300)]
+player1 = Player(400, 385)
+monsters = [monster.Skeleton(50), monster.Goblin(-300)]  # monster.Goblin(300)]
 surf = pygame.image.load(
     os.path.join('assets', 'Free Pixel Art Forest', 'Free Pixel Art Forest', 'Preview', 'Background.png'))
 surf = pygame.transform.scale(surf, (surf.get_width() / 1.25, surf.get_height() / 1.25))
@@ -86,7 +86,19 @@ while True:
         background.blit(player1.image, (player1.x, player1.y))
         for monst in monsters:
             background.blit(monst.image, (monst.x, monst.y))
+            if monst.has_projectile:
+                background.blit(monst.projectile_image, (monst.projectile_x, monst.y + 30))
+                print(monst.projectile_x)
+                if monst.projectile_x >= player1.x + 85 and monst.x <= player1.x + 95 and player1.jumping_sprite == 0:
+                    player1.health -= 10
+                    monst.has_projectile = False
+                elif monst.projectile_x >= player1.x + 85 and monst.x <= player1.x + 95 and player1.jumping_sprite != 0:
+                    monst.has_projectile = False
+
             monst.update(player1)
+            if not monst.has_projectile:
+                monst.throw()
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.display.quit()
@@ -120,7 +132,6 @@ while True:
             player1.rest()
         if last_key == pygame.K_SPACE:
 
-
             if not player1.attacks():
                 pygame.mixer.music.pause()
 
@@ -138,6 +149,7 @@ while True:
         if last_key == pygame.K_UP:
             if not player1.jumps():
                 last_key = None
+                player1.jumping_sprite = 0
 
         if player1.health == 0:
             player1.dies()

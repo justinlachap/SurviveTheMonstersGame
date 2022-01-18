@@ -39,6 +39,7 @@ class Player(pygame.sprite.Sprite):
         self.running = True
 
     def rest(self):
+        self.y = 385
         if self.wait % 2 == 0:
             if self.isGoingRight:
                 self.current_sprite += 1
@@ -53,6 +54,7 @@ class Player(pygame.sprite.Sprite):
         self.wait += 1
 
     def walks(self, right):
+        self.y = 385
         if right and self.running:
             self.x += 4
             self.current_sprite += 1
@@ -77,6 +79,7 @@ class Player(pygame.sprite.Sprite):
                         (0, 0, 0), (255, 0, 0), (0, 255, 0), self.health / MAX_HEALTH)
 
     def attacks(self):
+        self.y = 385
         if self.isGoingRight:
             self.image = self.attackR_sprites[self.attacking_sprite]
             self.attacking_sprite += 1
