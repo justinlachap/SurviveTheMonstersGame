@@ -37,7 +37,7 @@ play_button = font.render(text1, True, color)
 controls_button = font.render(text2, True, color)
 buttons = [pygame.Rect(220, 240, BUTTON_WIDTH, BUTTON_WIDTH / 2), pygame.Rect(370, 240, BUTTON_WIDTH, BUTTON_WIDTH / 2)]
 
-
+#test
 def draw_menu():
     background.blit(surf, (0, 0))
     for i, e in enumerate([(play_button, (253, 255)), (controls_button, ((390, 255)))]):
