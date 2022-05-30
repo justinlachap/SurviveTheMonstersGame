@@ -24,12 +24,9 @@ class Monster:
         self.current_throw_sprite = 0
         self.proj_sprites = []
 
-
     def update(self, player):
 
         self.isGoingRight = False if player.x < self.x else True
-
-
 
         # if self.count < self.starts_attacking:
         #     self.count += 1
@@ -51,7 +48,7 @@ class Monster:
             self.projectile_image = self.proj_sprites[self.current_throw_sprite]
             self.current_sprite = 0
             if self.projectile_isGoingRight:
-                if self.projectile_x-120 > player.x:
+                if self.projectile_x - 120 > player.x:
                     self.has_projectile = False
                     self.projectile_isGoingRight = None
                 else:
@@ -62,7 +59,7 @@ class Monster:
                     else:
                         self.projectile_x += 8
             elif not self.projectile_isGoingRight:
-                if self.projectile_x-40 < player.x:
+                if self.projectile_x - 40 < player.x:
                     self.has_projectile = False
                     self.projectile_isGoingRight = None
                 else:
@@ -73,23 +70,13 @@ class Monster:
                     else:
                         self.projectile_x -= 8
 
-
-
-
-
     def throw(self):
-        if self.current_sprite == abs(len(self.left_sprites))-1:
+        if self.current_sprite == abs(len(self.left_sprites)) - 1:
             self.has_projectile = True
-            if self.isGoingRight:
-                self.projectile_x = self.x + 65
-                self.projectile_isGoingRight = True
-            else:
-                self.projectile_x = self.x - 5
-                self.projectile_isGoingRight = False
+            self.projectile_isGoingRight = self.isGoingRight
+            self.projectile_x = self.x + 65 if self.isGoingRight else self.x - 5
         else:
             self.current_sprite += 1
-
-
 
 
 class Goblin(Monster):
@@ -105,33 +92,21 @@ class Goblin(Monster):
     def generateSprites(self):
         num_attack_sprites, num_throw_sprites = 12, 19
         for i in range(num_attack_sprites):
-            if i <= 9:
-                oldIm = pygame.image.load(
-                    os.path.join('assets', 'Monster_Creatures_Fantasy(Version 1.3)',
-                                 'Monster_Creatures_Fantasy(Version 1.3)', 'Goblin', 'attack',
-                                 'tile00{}.png'.format(i)))
-            else:
-                oldIm = pygame.image.load(
-                    os.path.join('assets', 'Monster_Creatures_Fantasy(Version 1.3)',
-                                 'Monster_Creatures_Fantasy(Version 1.3)', 'Goblin', 'attack',
-                                 'tile0{}.png'.format(i)))
+            oldIm = pygame.image.load(
+                os.path.join('assets', 'Monster_Creatures_Fantasy(Version 1.3)',
+                             'Monster_Creatures_Fantasy(Version 1.3)', 'Goblin', 'attack',
+                             ('tile00{}.png' if i<=9 else 'tile0{}.png').format(i)))
             newIm = pygame.transform.scale(oldIm, (oldIm.get_height() * SCALE, oldIm.get_width() * SCALE))
             self.right_sprites.append(newIm)
             self.left_sprites.append(pygame.transform.flip(newIm, True, False))
 
         for i in range(num_throw_sprites):
-            if i <= 9:
-                oldIm = pygame.image.load(
-                    os.path.join('assets', 'Monster_Creatures_Fantasy(Version 1.3)',
-                                 'Monster_Creatures_Fantasy(Version 1.3)', 'Goblin', 'projectile',
-                                 'tile00{}.png'.format(i)))
-            else:
-                oldIm = pygame.image.load(
-                    os.path.join('assets', 'Monster_Creatures_Fantasy(Version 1.3)',
-                                 'Monster_Creatures_Fantasy(Version 1.3)', 'Goblin', 'projectile',
-                                 'tile0{}.png'.format(i)))
-            newIm = pygame.transform.scale(oldIm, (oldIm.get_height() * SCALE, oldIm.get_width() * SCALE))
-            self.proj_sprites.append(newIm)
+            oldIm = pygame.image.load(
+                os.path.join('assets', 'Monster_Creatures_Fantasy(Version 1.3)',
+                             'Monster_Creatures_Fantasy(Version 1.3)', 'Goblin', 'projectile',
+                             ('tile00{}.png' if i <= 9 else 'tile0{}.png').format(i)))
+            self.proj_sprites.append(
+                pygame.transform.scale(oldIm, (oldIm.get_height() * SCALE, oldIm.get_width() * SCALE)))
 
 
 class Skeleton(Monster):
@@ -157,5 +132,5 @@ class Skeleton(Monster):
                 os.path.join('assets', 'Monster_Creatures_Fantasy(Version 1.3)',
                              'Monster_Creatures_Fantasy(Version 1.3)', 'Skeleton', 'projectile',
                              'tile00{}.png'.format(i)))
-            newIm = pygame.transform.scale(oldIm, (oldIm.get_height() * SCALE, oldIm.get_width() * SCALE))
-            self.proj_sprites.append(newIm)
+            self.proj_sprites.append(
+                pygame.transform.scale(oldIm, (oldIm.get_height() * SCALE, oldIm.get_width() * SCALE)))
