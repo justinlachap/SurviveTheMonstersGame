@@ -56,20 +56,23 @@ while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.display.quit()
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                x, y = event.pos
-                if not (buttons[0].collidepoint(x, y) or buttons[1].collidepoint(x, y)):
-                    continue
+            if not event.type == pygame.MOUSEBUTTONDOWN:
+                continue
 
-                if buttons[1].collidepoint(x, y):
-                    background.blit(controls, (200, 400))
-                    pygame.display.update()
-                    time.sleep(1.5)
-                in_menu = False
-                surf = pygame.image.load(
-                    os.path.join('assets', 'Free Pixel Art Forest', 'Free Pixel Art Forest', 'Preview',
-                                 'Background.png'))
-                surf = pygame.transform.scale(surf, (surf.get_width() / 1.25, surf.get_height() / 1.25))
+            x, y = event.pos
+            if not (buttons[0].collidepoint(x, y) or buttons[1].collidepoint(x, y)):
+                continue
+            in_menu = False
+            surf = pygame.image.load(
+                os.path.join('assets', 'Free Pixel Art Forest', 'Free Pixel Art Forest', 'Preview',
+                             'Background.png'))
+            surf = pygame.transform.scale(surf, (surf.get_width() / 1.25, surf.get_height() / 1.25))
+            if not buttons[1].collidepoint(x, y):
+                continue
+            background.blit(controls, (200, 400))
+            pygame.display.update()
+            time.sleep(1.5)
+
         continue
 
     time.sleep(FPS)
@@ -82,17 +85,21 @@ while True:
     background.blit(player1.image, (player1.x, player1.y))
     for monst in monsters:
         background.blit(monst.image, (monst.x, monst.y))
-        if monst.has_projectile:
-            background.blit(monst.projectile_image, (monst.projectile_x, monst.y + 30))
-            if monst.projectile_x >= player1.x + 85 and monst.x <= player1.x + 95:
-                monst.has_projectile = False
-                if player1.jumping_sprite == 0:
-                    player1.health -= 20
-
-            monst.update(player1)
-        else:
+        if not monst.has_projectile:
             monst.update(player1)
             monst.throw()
+            continue
+
+        background.blit(monst.projectile_image, (monst.projectile_x, monst.y + 30))
+        if not (monst.projectile_x >= player1.x + 85 and monst.x <= player1.x + 95):
+            monst.update(player1)
+            continue
+
+        monst.has_projectile = False
+        if player1.jumping_sprite == 0:
+            player1.health -= 20
+
+        monst.update(player1)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
