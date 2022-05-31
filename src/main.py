@@ -50,6 +50,7 @@ pygame.mixer.music.load(os.path.join('assets', 'sounds', 'run.wav'))
 
 music = False
 while True:
+    pygame.display.update()
     if in_menu:
         draw_menu()
         for event in pygame.event.get():
@@ -69,8 +70,6 @@ while True:
                     os.path.join('assets', 'Free Pixel Art Forest', 'Free Pixel Art Forest', 'Preview',
                                  'Background.png'))
                 surf = pygame.transform.scale(surf, (surf.get_width() / 1.25, surf.get_height() / 1.25))
-
-        pygame.display.update()
         continue
 
     time.sleep(FPS)
@@ -85,14 +84,14 @@ while True:
         background.blit(monst.image, (monst.x, monst.y))
         if monst.has_projectile:
             background.blit(monst.projectile_image, (monst.projectile_x, monst.y + 30))
-            if monst.projectile_x >= player1.x + 85 and monst.x <= player1.x + 95 and player1.jumping_sprite == 0:
-                player1.health -= 20
+            if monst.projectile_x >= player1.x + 85 and monst.x <= player1.x + 95:
                 monst.has_projectile = False
-            elif monst.projectile_x >= player1.x + 85 and monst.x <= player1.x + 95 and player1.jumping_sprite != 0:
-                monst.has_projectile = False
+                if player1.jumping_sprite == 0:
+                    player1.health -= 20
 
-        monst.update(player1)
-        if not monst.has_projectile:
+            monst.update(player1)
+        else:
+            monst.update(player1)
             monst.throw()
 
     for event in pygame.event.get():
@@ -145,4 +144,3 @@ while True:
 
     if player1.health == 0:
         player1.dies()
-    pygame.display.update()
