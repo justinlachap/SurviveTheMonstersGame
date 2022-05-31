@@ -9,8 +9,7 @@ def draw_health_bar(surf, pos, size, borderC, backC, healthC, progress):
     pygame.draw.rect(surf, borderC, (*pos, *size), 1)
     innerPos = (pos[0] + 1, pos[1] + 1)
     innerSize = ((size[0] - 2) * progress, size[1] - 2)
-    rect = (round(innerPos[0]), round(innerPos[1]), round(innerSize[0]), round(innerSize[1]))
-    pygame.draw.rect(surf, healthC, rect)
+    pygame.draw.rect(surf, healthC, (round(innerPos[0]), round(innerPos[1]), round(innerSize[0]), round(innerSize[1])))
 
 
 MAX_HEALTH = 100
@@ -40,18 +39,22 @@ class Player(pygame.sprite.Sprite):
 
     def rest(self):
         self.y = 385
-        if self.wait % 2 == 0:
-            if self.isGoingRight:
-                self.current_sprite += 1
-                if self.current_sprite >= len(self.staticR_sprites) or self.current_sprite < 0:
-                    self.current_sprite = 0
-                self.image = self.staticR_sprites[self.current_sprite]
-            else:
-                self.current_sprite -= 1
-                if -self.current_sprite >= len(self.staticL_sprites) or self.current_sprite > 0:
-                    self.current_sprite = 0
-                self.image = self.staticL_sprites[self.current_sprite]
+        if not self.wait % 2 == 0:
+            self.wait += 1
+            return None
+        self.change_sprite()
+        if self.isGoingRight:
+            if self.current_sprite >= len(self.staticR_sprites) or self.current_sprite < 0:
+                self.current_sprite = 0
+            self.image = self.staticR_sprites[self.current_sprite]
+        else:
+            if -self.current_sprite >= len(self.staticL_sprites) or self.current_sprite > 0:
+                self.current_sprite = 0
+            self.image = self.staticL_sprites[self.current_sprite]
         self.wait += 1
+
+    def change_sprite(self):
+        self.current_sprite = self.current_sprite + 1 if self.isGoingRight else self.current_sprite - 1
 
     def walks(self, right):
         self.y = 385
@@ -98,27 +101,14 @@ class Player(pygame.sprite.Sprite):
         return True
 
     def jumps(self):
-        if self.jumping_sprite <= 2:
-            self.y -= 20
-        else:
-            self.y += 20
+        self.y = self.y - 20 if self.jumping_sprite <= 2 else self.y + 20
+        self.jumping_sprite += 1
+        self.image = self.jumpR_sprites[self.jumping_sprite - 1] if self.isGoingRight else self.jumpL_sprites[
+            self.jumping_sprite - 1]
 
-
-        if self.isGoingRight:
-            self.image = self.jumpR_sprites[self.jumping_sprite]
-            self.jumping_sprite += 1
-
-            if self.jumping_sprite >= len(self.jumpR_sprites) or self.jumping_sprite < 0:
-                self.jumping_sprite = 0
-                return False
-
-        else:
-            self.image = self.jumpL_sprites[self.jumping_sprite]
-            self.jumping_sprite += 1
-
-            if self.jumping_sprite >= len(self.jumpL_sprites) or self.jumping_sprite < 0:
-                self.jumping_sprite = 0
-                return False
+        if self.jumping_sprite >= len(self.jumpL_sprites) or self.jumping_sprite < 0:
+            self.jumping_sprite = 0
+            return False
         return True
 
     def dies(self):

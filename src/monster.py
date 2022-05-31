@@ -23,52 +23,48 @@ class Monster:
 
         self.current_throw_sprite = 0
         self.proj_sprites = []
+        self.image, self.projectile_image = None, None
 
     def update(self, player):
 
         self.isGoingRight = False if player.x < self.x else True
-
-        # if self.count < self.starts_attacking:
-        #     self.count += 1
-        #     self.current_sprite = 1 if self.current_sprite == 0 else 0
-        #     self.image = self.right_sprites[self.current_sprite] if self.isGoingRight else self.left_sprites[
-        #         self.current_sprite]
 
         if self.isGoingRight:
             if self.current_sprite >= len(self.right_sprites):
                 self.current_sprite = 0
             self.image = self.right_sprites[self.current_sprite]
         else:
-            print("ok")
             if self.current_sprite >= len(self.left_sprites):
                 self.current_sprite = 0
             self.image = self.left_sprites[self.current_sprite]
 
-        if self.has_projectile:
-            self.projectile_image = self.proj_sprites[self.current_throw_sprite]
-            self.current_sprite = 0
-            if self.projectile_isGoingRight:
-                if self.projectile_x - 120 > player.x:
-                    self.has_projectile = False
-                    self.projectile_isGoingRight = None
+        if not self.has_projectile:
+            return None
+
+        self.projectile_image = self.proj_sprites[self.current_throw_sprite]
+        self.current_sprite = 0
+        if self.projectile_isGoingRight:
+            if self.projectile_x - 120 > player.x:
+                self.has_projectile = False
+                self.projectile_isGoingRight = None
+            else:
+                if player.image in player.left_sprites:
+                    self.projectile_x += 12
+                elif player.image in player.right_sprites:
+                    self.projectile_x += 4
                 else:
-                    if player.image in player.left_sprites:
-                        self.projectile_x += 12
-                    elif player.image in player.right_sprites:
-                        self.projectile_x += 4
-                    else:
-                        self.projectile_x += 8
-            elif not self.projectile_isGoingRight:
-                if self.projectile_x - 40 < player.x:
-                    self.has_projectile = False
-                    self.projectile_isGoingRight = None
+                    self.projectile_x += 8
+        elif not self.projectile_isGoingRight:
+            if self.projectile_x - 40 < player.x:
+                self.has_projectile = False
+                self.projectile_isGoingRight = None
+            else:
+                if player.image in player.left_sprites:
+                    self.projectile_x -= 4
+                elif player.image in player.right_sprites:
+                    self.projectile_x -= 12
                 else:
-                    if player.image in player.left_sprites:
-                        self.projectile_x -= 4
-                    elif player.image in player.right_sprites:
-                        self.projectile_x -= 12
-                    else:
-                        self.projectile_x -= 8
+                    self.projectile_x -= 8
 
     def throw(self):
         if self.current_sprite == abs(len(self.left_sprites)) - 1:
@@ -95,7 +91,7 @@ class Goblin(Monster):
             oldIm = pygame.image.load(
                 os.path.join('assets', 'Monster_Creatures_Fantasy(Version 1.3)',
                              'Monster_Creatures_Fantasy(Version 1.3)', 'Goblin', 'attack',
-                             ('tile00{}.png' if i<=9 else 'tile0{}.png').format(i)))
+                             ('tile00{}.png' if i <= 9 else 'tile0{}.png').format(i)))
             newIm = pygame.transform.scale(oldIm, (oldIm.get_height() * SCALE, oldIm.get_width() * SCALE))
             self.right_sprites.append(newIm)
             self.left_sprites.append(pygame.transform.flip(newIm, True, False))
