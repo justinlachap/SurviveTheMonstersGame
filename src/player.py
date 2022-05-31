@@ -7,9 +7,9 @@ import pygame
 def draw_health_bar(surf, pos, size, borderC, backC, healthC, progress):
     pygame.draw.rect(surf, backC, (*pos, *size))
     pygame.draw.rect(surf, borderC, (*pos, *size), 1)
-    innerPos = (pos[0] + 1, pos[1] + 1)
-    innerSize = ((size[0] - 2) * progress, size[1] - 2)
-    pygame.draw.rect(surf, healthC, (round(innerPos[0]), round(innerPos[1]), round(innerSize[0]), round(innerSize[1])))
+    inner_pos = (pos[0] + 1, pos[1] + 1)
+    inner_size = ((size[0] - 2) * progress, size[1] - 2)
+    pygame.draw.rect(surf, healthC, (round(inner_pos[0]), round(inner_pos[1]), round(inner_size[0]), round(inner_size[1])))
 
 
 MAX_HEALTH = 100
@@ -22,8 +22,8 @@ class Player(pygame.sprite.Sprite):
         self.attacking_sprite, self.jumping_sprite = 0, 0
         self.x = x
         self.y = y
-        self.isGoingRight = True
-        self.isAttacking = False
+        self.is_going_right = True
+        self.is_attacking = False
         self.health = 100
         self.running = False
 
@@ -43,7 +43,7 @@ class Player(pygame.sprite.Sprite):
             self.wait += 1
             return None
         self.change_sprite()
-        if self.isGoingRight:
+        if self.is_going_right:
             if self.current_sprite >= len(self.staticR_sprites) or self.current_sprite < 0:
                 self.current_sprite = 0
             self.image = self.staticR_sprites[self.current_sprite]
@@ -54,7 +54,7 @@ class Player(pygame.sprite.Sprite):
         self.wait += 1
 
     def change_sprite(self):
-        self.current_sprite = self.current_sprite + 1 if self.isGoingRight else self.current_sprite - 1
+        self.current_sprite = self.current_sprite + 1 if self.is_going_right else self.current_sprite - 1
 
     def walks(self, right):
         self.y = 385
@@ -65,7 +65,7 @@ class Player(pygame.sprite.Sprite):
                 self.current_sprite = 0
 
             self.image = self.right_sprites[self.current_sprite]
-            self.isGoingRight = True
+            self.is_going_right = True
 
         elif not right and self.running:
             self.x -= 4
@@ -74,7 +74,7 @@ class Player(pygame.sprite.Sprite):
                 self.current_sprite = 0
 
             self.image = self.left_sprites[-self.current_sprite]
-            self.isGoingRight = False
+            self.is_going_right = False
 
     def draw_health(self, surf):
         health_rect = pygame.Rect(self.x + 145, self.y + 88, self.image.get_width() / 9, 10)
@@ -83,7 +83,7 @@ class Player(pygame.sprite.Sprite):
 
     def attacks(self):
         self.y = 385
-        if self.isGoingRight:
+        if self.is_going_right:
             self.image = self.attackR_sprites[self.attacking_sprite]
             self.attacking_sprite += 1
 
@@ -103,7 +103,7 @@ class Player(pygame.sprite.Sprite):
     def jumps(self):
         self.y = self.y - 20 if self.jumping_sprite <= 2 else self.y + 20
         self.jumping_sprite += 1
-        self.image = self.jumpR_sprites[self.jumping_sprite - 1] if self.isGoingRight else self.jumpL_sprites[
+        self.image = self.jumpR_sprites[self.jumping_sprite - 1] if self.is_going_right else self.jumpL_sprites[
             self.jumping_sprite - 1]
 
         if self.jumping_sprite >= len(self.jumpL_sprites) or self.jumping_sprite < 0:

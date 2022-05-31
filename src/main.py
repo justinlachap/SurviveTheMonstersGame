@@ -15,11 +15,11 @@ os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (SCREEN_POS, SCREEN_POS)
 pygame.init()
 background = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
-player1 = Player(400, 385)
+player_1 = Player(400, 385)
 monsters = [monster.Skeleton(50), monster.Goblin(-300)]
-surf = pygame.image.load(
+surface = pygame.image.load(
     os.path.join('assets', 'Free Pixel Art Forest', 'Free Pixel Art Forest', 'Preview', 'Background.png'))
-surf = pygame.transform.scale(surf, (surf.get_width() / 1.25, surf.get_height() / 1.25))
+surface = pygame.transform.scale(surface, (surface.get_width() / 1.25, surface.get_height() / 1.25))
 controls = pygame.image.load(
     os.path.join('assets', 'controls.png'))
 controls = pygame.transform.scale(controls, (controls.get_width() / 2.5, controls.get_height() / 2.5))
@@ -39,9 +39,9 @@ buttons = [pygame.Rect(220, 240, BUTTON_WIDTH, BUTTON_WIDTH / 2), pygame.Rect(37
 
 # test
 def draw_menu():
-    background.blit(surf, (0, 0))
+    background.blit(surface, (0, 0))
     for i, e in enumerate([(play_button, (253, 255)), (controls_button, (390, 255))]):
-        pygame.draw.ellipse(surf, [49, 121, 176], buttons[i])
+        pygame.draw.ellipse(surface, [49, 121, 176], buttons[i])
         background.blit(e[0], e[1])
 
 
@@ -63,10 +63,10 @@ while True:
             if not (buttons[0].collidepoint(x, y) or buttons[1].collidepoint(x, y)):
                 continue
             in_menu = False
-            surf = pygame.image.load(
+            surface = pygame.image.load(
                 os.path.join('assets', 'Free Pixel Art Forest', 'Free Pixel Art Forest', 'Preview',
                              'Background.png'))
-            surf = pygame.transform.scale(surf, (surf.get_width() / 1.25, surf.get_height() / 1.25))
+            surface = pygame.transform.scale(surface, (surface.get_width() / 1.25, surface.get_height() / 1.25))
             if not buttons[1].collidepoint(x, y):
                 continue
             background.blit(controls, (200, 400))
@@ -76,30 +76,30 @@ while True:
         continue
 
     time.sleep(FPS)
-    rel_x = background_x % surf.get_rect().width
-    background.blit(surf, (rel_x - surf.get_rect().width, 0))
+    rel_x = background_x % surface.get_rect().width
+    background.blit(surface, (rel_x - surface.get_rect().width, 0))
     if rel_x < SCREEN_WIDTH:
-        background.blit(surf, (rel_x, 0))
+        background.blit(surface, (rel_x, 0))
 
-    player1.readjust(background)
-    background.blit(player1.image, (player1.x, player1.y))
+    player_1.readjust(background)
+    background.blit(player_1.image, (player_1.x, player_1.y))
     for monst in monsters:
         background.blit(monst.image, (monst.x, monst.y))
         if not monst.has_projectile:
-            monst.update(player1)
+            monst.update(player_1)
             monst.throw()
             continue
 
         background.blit(monst.projectile_image, (monst.projectile_x, monst.y + 30))
-        if not (monst.projectile_x >= player1.x + 85 and monst.x <= player1.x + 95):
-            monst.update(player1)
+        if not (monst.projectile_x >= player_1.x + 85 and monst.x <= player_1.x + 95):
+            monst.update(player_1)
             continue
 
         monst.has_projectile = False
-        if player1.jumping_sprite == 0:
-            player1.health -= 20
+        if player_1.jumping_sprite == 0:
+            player_1.health -= 20
 
-        monst.update(player1)
+        monst.update(player_1)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -112,8 +112,8 @@ while True:
         if not music:
             pygame.mixer.music.play()
             music = True
-        player1.animate()
-        player1.walks(True)
+        player_1.animate()
+        player_1.walks(True)
         background_x -= 5
         for monst in monsters:
             monst.x -= 5
@@ -121,8 +121,8 @@ while True:
         if not music:
             pygame.mixer.music.play()
             music = True
-        player1.animate()
-        player1.walks(False)
+        player_1.animate()
+        player_1.walks(False)
         background_x += 5
         for monst in monsters:
             monst.x += 5
@@ -130,8 +130,8 @@ while True:
         if music:
             pygame.mixer.music.stop()
             music = 0
-        player1.rest()
-    if last_key == pygame.K_SPACE and not player1.attacks():
+        player_1.rest()
+    if last_key == pygame.K_SPACE and not player_1.attacks():
         pygame.mixer.music.pause()
 
         sound = pygame.mixer.Sound(os.path.join("assets", "sounds", "sword.mp3"))
@@ -139,15 +139,15 @@ while True:
         last_key = None
         new_monsters = monsters
         for enemy in monsters:
-            if player1.isGoingRight and player1.x + 161 > enemy.x >= player1.x + 71 or (
-                    not player1.isGoingRight and player1.x - 90 < enemy.x <= player1.x + 44):
+            if player_1.is_going_right and player_1.x + 161 > enemy.x >= player_1.x + 71 or (
+                    not player_1.is_going_right and player_1.x - 90 < enemy.x <= player_1.x + 44):
                 new_monsters.remove(enemy)
 
         monsters = new_monsters
 
-    if last_key == pygame.K_UP and not player1.jumps():
+    if last_key == pygame.K_UP and not player_1.jumps():
         last_key = None
-        player1.jumping_sprite = 0
+        player_1.jumping_sprite = 0
 
-    if player1.health == 0:
-        player1.dies()
+    if player_1.health == 0:
+        player_1.dies()
