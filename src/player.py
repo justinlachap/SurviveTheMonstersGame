@@ -9,7 +9,8 @@ def draw_health_bar(surf, pos, size, borderC, backC, healthC, progress):
     pygame.draw.rect(surf, borderC, (*pos, *size), 1)
     inner_pos = (pos[0] + 1, pos[1] + 1)
     inner_size = ((size[0] - 2) * progress, size[1] - 2)
-    pygame.draw.rect(surf, healthC, (round(inner_pos[0]), round(inner_pos[1]), round(inner_size[0]), round(inner_size[1])))
+    pygame.draw.rect(surf, healthC,
+                     (round(inner_pos[0]), round(inner_pos[1]), round(inner_size[0]), round(inner_size[1])))
 
 
 MAX_HEALTH = 100
@@ -19,7 +20,7 @@ SCALE = 2
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
-        self.attacking_sprite, self.jumping_sprite = 0, 0
+        self.attacking_sprite, self.jumping_sprite, self.death_sprite = 0, 0, 0
         self.x = x
         self.y = y
         self.is_going_right = True
@@ -27,7 +28,12 @@ class Player(pygame.sprite.Sprite):
         self.health = 100
         self.running = False
 
-        self.right_sprites, self.left_sprites, self.staticR_sprites, self.staticL_sprites, self.attackR_sprites, self.attackL_sprites, self.jumpR_sprites, self.jumpL_sprites = [], [], [], [], [], [], [], []
+        self.right_sprites, self.left_sprites, self.staticR_sprites, \
+        self.staticL_sprites, self.attackR_sprites, self.attackL_sprites, \
+        self.jumpR_sprites, self.jumpL_sprites, self.deathR_sprites, self.right_sprites, \
+        self.left_sprites, self.staticR_sprites, self.staticL_sprites, self.attackR_sprites, \
+        self.attackL_sprites, self.jumpR_sprites, self.jumpL_sprites, self.deathL_sprites, = [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []
+
         self.generateSprites()
 
         self.current_sprite = 0
@@ -112,12 +118,22 @@ class Player(pygame.sprite.Sprite):
         return True
 
     def dies(self):
-        pass
+        if self.is_going_right:
+            self.image = self.deathR_sprites[self.death_sprite]
+            self.death_sprite += 1
+
+        else:
+            self.image = self.deathL_sprites[self.death_sprite]
+            self.death_sprite += 1
+
+
+
 
     def generateSprites(self):
         num_walking_sprites = 8
         num_jumping_sprites = 6
         num_static_sprites = 10
+        num_death_sprites = 7
 
         for i in range(num_walking_sprites):
             oldIm = pygame.image.load(
@@ -151,6 +167,14 @@ class Player(pygame.sprite.Sprite):
             newIm = pygame.transform.scale(oldIm, (oldIm.get_height() * SCALE, oldIm.get_width() * SCALE))
             self.staticR_sprites.append(newIm)
             self.staticL_sprites.append(pygame.transform.flip(newIm, True, False))
+
+        for i in range(num_death_sprites):
+            oldIm = pygame.image.load(
+                os.path.join('assets', 'Monster_Creatures_Fantasy(Version 1.3)', 'Fantasy Warrior', 'Sprites', 'death',
+                             'tile00{}.png'.format(i)))
+            newIm = pygame.transform.scale(oldIm, (oldIm.get_height() * SCALE, oldIm.get_width() * SCALE))
+            self.deathR_sprites.append(newIm)
+            self.deathL_sprites.append(pygame.transform.flip(newIm, True, False))
 
     def readjust(self, bg):
         self.draw_health(bg)

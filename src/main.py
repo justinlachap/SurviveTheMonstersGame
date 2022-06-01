@@ -15,8 +15,10 @@ os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (SCREEN_POS, SCREEN_POS)
 pygame.init()
 background = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
-player_1 = Player(400, 385)
-monsters = [monster.Skeleton(50), monster.Goblin(-300)]
+
+player_1 = None
+monsters = None
+last_key = None
 surface = pygame.image.load(
     os.path.join('assets', 'Free Pixel Art Forest', 'Free Pixel Art Forest', 'Preview', 'Background.png'))
 surface = pygame.transform.scale(surface, (surface.get_width() / 1.25, surface.get_height() / 1.25))
@@ -24,7 +26,7 @@ controls = pygame.image.load(
     os.path.join('assets', 'controls.png'))
 controls = pygame.transform.scale(controls, (controls.get_width() / 2.5, controls.get_height() / 2.5))
 
-last_key = None
+
 background_x = 0
 in_menu = True
 
@@ -63,6 +65,9 @@ while True:
             if not (buttons[0].collidepoint(x, y) or buttons[1].collidepoint(x, y)):
                 continue
             in_menu = False
+            player_1 = Player(400, 385)
+            monsters = [monster.Skeleton(50), monster.Goblin(-300)]
+            last_key = None
             surface = pygame.image.load(
                 os.path.join('assets', 'Free Pixel Art Forest', 'Free Pixel Art Forest', 'Preview',
                              'Background.png'))
@@ -97,7 +102,7 @@ while True:
 
         monst.has_projectile = False
         if player_1.jumping_sprite == 0:
-            player_1.health -= 20
+            player_1.health -= 15
 
         monst.update(player_1)
 
@@ -130,7 +135,8 @@ while True:
         if music:
             pygame.mixer.music.stop()
             music = 0
-        player_1.rest()
+        if player_1.health > 0:
+            player_1.rest()
     if last_key == pygame.K_SPACE and not player_1.attacks():
         pygame.mixer.music.pause()
 
@@ -149,5 +155,11 @@ while True:
         last_key = None
         player_1.jumping_sprite = 0
 
-    if player_1.health == 0:
-        player_1.dies()
+    if player_1.health <= 0:
+        for i in range(7):
+            time.sleep(0.2)
+            player_1.dies()
+            background.blit(surface, (rel_x - surface.get_rect().width, 0))
+            background.blit(player_1.image, (player_1.x, player_1.y))
+            pygame.display.update()
+        in_menu = True
