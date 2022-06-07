@@ -1,5 +1,5 @@
-import sys
-import time
+from sys import exit
+from time import sleep
 
 import pygame.transform
 
@@ -38,13 +38,12 @@ play_button = font.render(text1, True, color)
 controls_button = font.render(text2, True, color)
 buttons = [pygame.Rect(220, 240, BUTTON_WIDTH, BUTTON_WIDTH / 2), pygame.Rect(370, 240, BUTTON_WIDTH, BUTTON_WIDTH / 2)]
 
-
-# test
 def draw_menu():
     background.blit(surface, (0, 0))
-    for i, e in enumerate([(play_button, (253, 255)), (controls_button, (390, 255))]):
-        pygame.draw.ellipse(surface, [49, 121, 176], buttons[i])
+    for j, e in enumerate([(play_button, (253, 255)), (controls_button, (390, 255))]):
+        pygame.draw.ellipse(surface, [49, 121, 176], buttons[j])
         background.blit(e[0], e[1])
+
 
 
 pygame.mixer.init()
@@ -76,11 +75,11 @@ while True:
                 continue
             background.blit(controls, (200, 400))
             pygame.display.update()
-            time.sleep(1.5)
+            sleep(1.5)
 
         continue
 
-    time.sleep(FPS)
+    sleep(FPS)
     rel_x = background_x % surface.get_rect().width
     background.blit(surface, (rel_x - surface.get_rect().width, 0))
     if rel_x < SCREEN_WIDTH:
@@ -109,7 +108,7 @@ while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.display.quit()
-            sys.exit()
+            exit()
         if event.type == pygame.KEYDOWN:
             last_key = event.key
 
@@ -134,7 +133,7 @@ while True:
     if last_key == pygame.K_DOWN or not last_key:
         if music:
             pygame.mixer.music.stop()
-            music = 0
+            music = False
         if player_1.health > 0:
             player_1.rest()
     if last_key == pygame.K_SPACE and not player_1.attacks():
@@ -143,6 +142,10 @@ while True:
         sound = pygame.mixer.Sound(os.path.join("assets", "sounds", "sword.mp3"))
         sound.play()
         last_key = None
+
+
+
+       # Idéalement on utiliserait filter/lambda pour le bloc de code suivant
         new_monsters = monsters
         for enemy in monsters:
             if player_1.is_going_right and player_1.x + 161 > enemy.x >= player_1.x + 71 or (
@@ -156,8 +159,11 @@ while True:
         player_1.jumping_sprite = 0
 
     if player_1.health <= 0:
+        if music:
+            pygame.mixer.music.stop()
+            music = False
         for i in range(7):
-            time.sleep(0.2)
+            sleep(0.2)
             player_1.dies()
             background.blit(surface, (rel_x - surface.get_rect().width, 0))
             background.blit(player_1.image, (player_1.x, player_1.y))
