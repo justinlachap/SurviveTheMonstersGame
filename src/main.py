@@ -1,3 +1,4 @@
+from random import choice
 from sys import exit
 from time import sleep
 
@@ -15,7 +16,6 @@ os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (SCREEN_POS, SCREEN_POS)
 pygame.init()
 background = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
-
 player_1 = None
 monsters = None
 last_key = None
@@ -25,7 +25,6 @@ surface = pygame.transform.scale(surface, (surface.get_width() / 1.25, surface.g
 controls = pygame.image.load(
     os.path.join('assets', 'controls.png'))
 controls = pygame.transform.scale(controls, (controls.get_width() / 2.5, controls.get_height() / 2.5))
-
 
 background_x = 0
 in_menu = True
@@ -38,12 +37,28 @@ play_button = font.render(text1, True, color)
 controls_button = font.render(text2, True, color)
 buttons = [pygame.Rect(220, 240, BUTTON_WIDTH, BUTTON_WIDTH / 2), pygame.Rect(370, 240, BUTTON_WIDTH, BUTTON_WIDTH / 2)]
 
+
 def draw_menu():
     background.blit(surface, (0, 0))
     for j, e in enumerate([(play_button, (253, 255)), (controls_button, (390, 255))]):
         pygame.draw.ellipse(surface, [49, 121, 176], buttons[j])
         background.blit(e[0], e[1])
 
+
+def filter_monsters(monsters, player):
+    # Idéalement on utiliserait filter/lambda pour le bloc de code suivant
+    new_monsters = monsters
+    for enemy in monsters:
+        if player.is_going_right and player.x + 161 > enemy.x >= player.x + 71 or (
+                not player.is_going_right and player.x - 90 < enemy.x <= player.x + 44):
+            new_monsters.remove(enemy)
+
+    return new_monsters
+
+
+def generate_new_monsters(monsters, player):
+    return monsters + [choice([monster.Skeleton(player.x - 500), monster.Goblin(player.x - 500)])] if (
+                len(monsters) < 2) else monsters
 
 
 pygame.mixer.init()
@@ -142,17 +157,8 @@ while True:
         sound = pygame.mixer.Sound(os.path.join("assets", "sounds", "sword.mp3"))
         sound.play()
         last_key = None
-
-
-
-       # Idéalement on utiliserait filter/lambda pour le bloc de code suivant
-        new_monsters = monsters
-        for enemy in monsters:
-            if player_1.is_going_right and player_1.x + 161 > enemy.x >= player_1.x + 71 or (
-                    not player_1.is_going_right and player_1.x - 90 < enemy.x <= player_1.x + 44):
-                new_monsters.remove(enemy)
-
-        monsters = new_monsters
+        monsters = filter_monsters(monsters, player_1)
+        monsters = generate_new_monsters(monsters, player_1)
 
     if last_key == pygame.K_UP and not player_1.jumps():
         last_key = None
