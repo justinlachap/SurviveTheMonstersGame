@@ -1,12 +1,12 @@
 import os
-
 import pygame
 from src.static.csts import *
+
 
 class Monster:
     def __init__(self, x):
         self.x = x
-        self.health = 100
+        self.health = MONSTER_MAX_HEALTH
         self.right_sprites = []
         self.left_sprites = []
         self.current_sprite = 0
@@ -17,7 +17,6 @@ class Monster:
         self.has_projectile = False
         self.projectile_x = None
         self.projectile_is_going_right = None
-
         self.current_throw_sprite = 0
         self.proj_sprites = []
         self.image, self.projectile_image = None, None
@@ -32,7 +31,6 @@ class Monster:
             if self.current_sprite >= len(self.left_sprites):
                 self.current_sprite = 0
             self.image = self.left_sprites[self.current_sprite]
-
         if not self.has_projectile:
             return None
         self.projectile_image = self.proj_sprites[self.current_throw_sprite]
@@ -72,55 +70,54 @@ class Monster:
 class Goblin(Monster):
     def __init__(self, x):
         super().__init__(x)
-        self.generateSprites()
+        self.generate_sprites()
         self.image = self.right_sprites[self.current_sprite]
         self.y = 430
         self.count, starts_attacking = 0, 100
-
         self.projectile_image = self.proj_sprites[self.current_throw_sprite]
 
-    def generateSprites(self):
+    def generate_sprites(self):
         num_attack_sprites, num_throw_sprites = 12, 19
         for i in range(num_attack_sprites):
-            oldIm = pygame.image.load(
+            old_image = pygame.image.load(
                 os.path.join('assets', 'Monster_Creatures_Fantasy(Version 1.3)',
                              'Monster_Creatures_Fantasy(Version 1.3)', 'Goblin', 'attack',
                              ('tile00{}.png' if i <= 9 else 'tile0{}.png').format(i)))
-            newIm = pygame.transform.scale(oldIm, (oldIm.get_height() * MONSTER_SCALE, oldIm.get_width() * MONSTER_SCALE))
-            self.right_sprites.append(newIm)
-            self.left_sprites.append(pygame.transform.flip(newIm, True, False))
+            new_image = pygame.transform.scale(old_image, (old_image.get_height() * MONSTER_SCALE, old_image.get_width() * MONSTER_SCALE))
+            self.right_sprites.append(new_image)
+            self.left_sprites.append(pygame.transform.flip(new_image, True, False))
 
         for i in range(num_throw_sprites):
-            oldIm = pygame.image.load(
+            old_image = pygame.image.load(
                 os.path.join('assets', 'Monster_Creatures_Fantasy(Version 1.3)',
                              'Monster_Creatures_Fantasy(Version 1.3)', 'Goblin', 'projectile',
                              ('tile00{}.png' if i <= 9 else 'tile0{}.png').format(i)))
             self.proj_sprites.append(
-                pygame.transform.scale(oldIm, (oldIm.get_height() * MONSTER_SCALE, oldIm.get_width() * MONSTER_SCALE)))
+                pygame.transform.scale(old_image, (old_image.get_height() * MONSTER_SCALE, old_image.get_width() * MONSTER_SCALE)))
 
 
 class Skeleton(Monster):
     def __init__(self, x):
         super().__init__(x)
-        self.generateSprites()
+        self.generate_sprites()
         self.image = self.right_sprites[self.current_sprite]
         self.y = 433
         self.projectile_image = self.proj_sprites[self.current_throw_sprite]
 
-    def generateSprites(self):
+    def generate_sprites(self):
         num_attack_sprites, num_throw_sprites = 6, 8
         for i in range(num_attack_sprites):
-            oldIm = pygame.image.load(
+            old_image = pygame.image.load(
                 os.path.join('assets', 'Monster_Creatures_Fantasy(Version 1.3)',
                              'Monster_Creatures_Fantasy(Version 1.3)', 'Skeleton', 'attack',
                              'tile00{}.png'.format(i)))
-            newIm = pygame.transform.scale(oldIm, (oldIm.get_height() * MONSTER_SCALE, oldIm.get_width() * MONSTER_SCALE))
-            self.right_sprites.append(newIm)
-            self.left_sprites.append(pygame.transform.flip(newIm, True, False))
+            new_image = pygame.transform.scale(old_image, (old_image.get_height() * MONSTER_SCALE, old_image.get_width() * MONSTER_SCALE))
+            self.right_sprites.append(new_image)
+            self.left_sprites.append(pygame.transform.flip(new_image, True, False))
         for i in range(num_throw_sprites):
-            oldIm = pygame.image.load(
+            old_image = pygame.image.load(
                 os.path.join('assets', 'Monster_Creatures_Fantasy(Version 1.3)',
                              'Monster_Creatures_Fantasy(Version 1.3)', 'Skeleton', 'projectile',
                              'tile00{}.png'.format(i)))
             self.proj_sprites.append(
-                pygame.transform.scale(oldIm, (oldIm.get_height() * MONSTER_SCALE, oldIm.get_width() * MONSTER_SCALE)))
+                pygame.transform.scale(old_image, (old_image.get_height() * MONSTER_SCALE, old_image.get_width() * MONSTER_SCALE)))
