@@ -6,11 +6,7 @@ import pygame.transform
 
 import monster
 from src.player import *
-
-FPS = 0.05
-SCREEN_WIDTH, SCREEN_HEIGHT = 742, 634
-BUTTON_WIDTH = 100
-SCREEN_POS = 30
+from src.static.csts import *
 
 os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (SCREEN_POS, SCREEN_POS)
 pygame.init()
@@ -30,9 +26,9 @@ background_x = 0
 in_menu = True
 
 pygame.font.init()
-font = pygame.font.Font(pygame.font.match_font('arial'), 14)
+font = pygame.font.Font(pygame.font.match_font(DEFAULT_FONT_FAMILY), DEFAULT_FONT_SIZE)
 text1, text2 = 'PLAY', 'CONTROLS'
-color = (255, 255, 255)
+color = COLOR_WHITE
 play_button = font.render(text1, True, color)
 controls_button = font.render(text2, True, color)
 buttons = [pygame.Rect(220, 240, BUTTON_WIDTH, BUTTON_WIDTH / 2), pygame.Rect(370, 240, BUTTON_WIDTH, BUTTON_WIDTH / 2)]
@@ -41,14 +37,15 @@ buttons = [pygame.Rect(220, 240, BUTTON_WIDTH, BUTTON_WIDTH / 2), pygame.Rect(37
 def draw_menu():
     background.blit(surface, (0, 0))
     for j, e in enumerate([(play_button, (253, 255)), (controls_button, (390, 255))]):
-        pygame.draw.ellipse(surface, [49, 121, 176], buttons[j])
+        pygame.draw.ellipse(surface, COLOR_BTN_CTRL, buttons[j])
         background.blit(e[0], e[1])
 
 
-def filter_monsters(monsters, player):
+# On devrait faire une classe pour garder les monsters au lieu de passer par réf.
+def filter_monsters(_monsters, player):
     # Idéalement on utiliserait filter/lambda pour le bloc de code suivant
-    new_monsters = monsters
-    for enemy in monsters:
+    new_monsters = _monsters
+    for enemy in _monsters:
         if player.is_going_right and player.x + 161 > enemy.x >= player.x + 71 or (
                 not player.is_going_right and player.x - 90 < enemy.x <= player.x + 44):
             new_monsters.remove(enemy)
@@ -56,9 +53,9 @@ def filter_monsters(monsters, player):
     return new_monsters
 
 
-def generate_new_monsters(monsters, player):
-    return monsters + [choice([monster.Skeleton(player.x - 500), monster.Goblin(player.x - 500)])] if (
-                len(monsters) < 2) else monsters
+def generate_new_monsters(_monsters, player):
+    return _monsters + [choice([monster.Skeleton(player.x - 500), monster.Goblin(player.x - 500)])] if (
+                len(_monsters) < 2) else _monsters
 
 
 pygame.mixer.init()
@@ -127,7 +124,7 @@ while True:
         if event.type == pygame.KEYDOWN:
             last_key = event.key
 
-    if last_key == pygame.K_RIGHT:
+    if last_key == pygame.K_RIGHT or last_key == pygame.K_d:
         if not music:
             pygame.mixer.music.play()
             music = True
@@ -136,7 +133,7 @@ while True:
         background_x -= 5
         for monst in monsters:
             monst.x -= 5
-    if last_key == pygame.K_LEFT:
+    if last_key == pygame.K_LEFT or last_key == pygame.K_a:
         if not music:
             pygame.mixer.music.play()
             music = True
@@ -145,7 +142,7 @@ while True:
         background_x += 5
         for monst in monsters:
             monst.x += 5
-    if last_key == pygame.K_DOWN or not last_key:
+    if last_key == pygame.K_DOWN or last_key == pygame.K_s or not last_key:
         if music:
             pygame.mixer.music.stop()
             music = False
@@ -160,7 +157,7 @@ while True:
         monsters = filter_monsters(monsters, player_1)
         monsters = generate_new_monsters(monsters, player_1)
 
-    if last_key == pygame.K_UP and not player_1.jumps():
+    if (last_key == pygame.K_UP or last_key == pygame.K_w) and not player_1.jumps():
         last_key = None
         player_1.jumping_sprite = 0
 
